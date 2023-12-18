@@ -17,7 +17,7 @@ part1(LCs, Part) :-
 	aggregate_all(
 		sum(Combs),
 		(	member(L-C, LCs),
-			% g (i.e. good, vs bad) is a convenient, neutral end-of-previous
+			% g (i.e. good, vs damaged) is a convenient, neutral end-of-previous
 			clumped_dam_combs_sum(L, C, g, Combs)
 		),
 		Part
