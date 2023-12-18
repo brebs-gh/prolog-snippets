@@ -17,11 +17,12 @@ part1(LCs, Part) :-
 	aggregate_all(
 		sum(Combs),
 		(	member(L-C, LCs),
+			% g (i.e. good, vs bad) is a convenient, neutral end-of-previous
 			clumped_dam_combs_sum(L, C, g, Combs)
 		),
 		Part
 	).
-	
+
 part2(LCs, Part) :-
 	aggregate_all(
 		sum(Combs),
@@ -56,10 +57,7 @@ spring_list([u|T]) -->
 
 damaged_count_list([]) --> [].
 damaged_count_list([I|T]) -->
-	digits_basic([DH|DT]),
-	{	number_codes(I, [DH|DT]),
-		integer(I)
-	},
+	int(I),
 	damaged_count_list_next(T).
 
 damaged_count_list_next([]) --> [].
@@ -67,14 +65,18 @@ damaged_count_list_next(L) -->
 	",",
 	damaged_count_list(L).
 
-digits_basic([]) --> [].
-digits_basic([H|T]) -->
-	digit_basic(H),
-	digits_basic(T).
-
-digit_basic(D) -->
+int(0) --> "0".
+int(I) -->
 	[D],
-	{ code_type(D, digit) }.
+	{ between(0'1, 0'9, D) },
+	int_(Ds),
+	{ number_codes(I, [D|Ds]) }.
+
+int_([]) --> [].
+int_([H|T]) -->
+	[H],
+	{ between(0'0, 0'9, H) },
+	int_(T).
 
 part2_unfold(L, C, UFL, UFC) :-
 	append([L, [u], L, [u], L, [u], L, [u], L], UFL),
@@ -87,12 +89,13 @@ clumped_dam_combs_sum(L, SL, P, Combs) :-
 
 clumped_dam_combs([], [], _P, 1).
 clumped_dam_combs([g|T], SL, _P, Combs) :-
+	% Using tabling here (is quicker to *not* use it in the other predicates below)
 	clumped_dam_combs_sum(T, SL, g, Combs).
 clumped_dam_combs([d|T], [SL|R], g, Combs) :-
 	clumped_populate_d(T, SL, T0),
 	clumped_dam_combs(T0, R, d, Combs).
 clumped_dam_combs([u|T], SL, P, Combs) :-
-	% Aids tabling
+	% Ground parameters help the tabling
 	member(E, [d, g]),
 	clumped_dam_combs([E|T], SL, P, Combs).
 
