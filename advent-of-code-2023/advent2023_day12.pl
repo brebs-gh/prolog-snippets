@@ -55,7 +55,6 @@ spring_list([u|T]) -->
 	"?",
 	spring_list(T).
 
-damaged_count_list([]) --> [].
 damaged_count_list([I|T]) -->
 	int(I),
 	damaged_count_list_next(T).
